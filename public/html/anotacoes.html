@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anota&ccedil;&otilde;es - GACP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/anotacoes.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <section class="profile-section">
+      <div class="profile-photo-container">
+        <img id="profilePhoto" class="profile-photo" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRkZGRkZGIi8+CjxjaXJjbGUgY3g9IjUwIiBjeT0iMzUiIHI9IjE1IiBmaWxsPSIjQ0NDQ0NDIi8+CjxyZWN0IHg9IjMwIiB5PSI2MCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjMwIiBmaWxsPSIjQ0NDQ0NDIi8+Cjwvc3ZnPgo=" alt="Foto do usu&aacute;rio">
+        <div class="photo-edit-overlay">
+          <label for="photoInput" class="photo-edit-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+              <circle cx="12" cy="13" r="4"/>
+            </svg>
+          </label>
+          <input id="photoInput" type="file" accept="image/*" hidden>
+        </div>
+      </div>
+      <h3 id="userName" class="user-name">Carregando...</h3>
+      <button type="button" class="logout-btn" onclick="logout()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16,17 21,12 16,7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        Sair
+      </button>
+    </section>
+
+    <nav class="navigation-section">
+      <h4 class="nav-title">Navega&ccedil;&atilde;o</h4>
+      <a class="nav-link" href="/home">Home</a>
+      <a class="nav-link" href="/ver-empenhos">Ver Empenhos</a>
+      <a class="nav-link" href="/ver-pagamentos">Ver Pagamentos</a>
+      <a class="nav-link active" href="/anotacoes">Anota&ccedil;&otilde;es</a>
+      <a class="nav-link" href="/adicionar-empenho">Adicionar Empenho</a>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <header class="page-header">
+      <h1>Anota&ccedil;&otilde;es</h1>
+      <p class="page-subtitle">Crie e gerencie anota&ccedil;&otilde;es vinculadas aos empenhos do sistema.</p>
+    </header>
+
+    <section class="anotacao-form">
+      <label for="textoAnotacao" class="form-label">Nova anota&ccedil;&atilde;o</label>
+      <textarea id="textoAnotacao" placeholder="Digite sua anota&ccedil;&atilde;o aqui..." rows="4"></textarea>
+
+      <label for="empenhoSelect" class="form-label">Vincular a um empenho (opcional)</label>
+      <select id="empenhoSelect" class="select-empenho">
+        <option value="">Sem v&iacute;nculo</option>
+      </select>
+
+      <button id="btnSalvar" class="button">Salvar anota&ccedil;&atilde;o</button>
+    </section>
+
+    <section class="anotacoes-container">
+      <div class="section-header">
+        <h2>Anota&ccedil;&otilde;es recentes</h2>
+        <button type="button" class="button secundario" onclick="location.reload()">Atualizar lista</button>
+      </div>
+      <div id="listaAnotacoes" class="lista-anotacoes"></div>
+    </section>
+  </main>
+
+  <div id="modalEdicao" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Editar anota&ccedil;&atilde;o</h2>
+      <label for="editTextarea" class="form-label">Anota&ccedil;&atilde;o</label>
+      <textarea id="editTextarea" placeholder="Digite sua anota&ccedil;&atilde;o aqui..." rows="4"></textarea>
+      <label for="editEmpenhoSelect" class="form-label">Empenho vinculado</label>
+      <select id="editEmpenhoSelect" class="select-empenho">
+        <option value="">Sem v&iacute;nculo</option>
+      </select>
+      <input type="text" id="motivoEdicao" placeholder="Motivo da edi&ccedil;&atilde;o (obrigat&oacute;rio)" required>
+      <div class="modal-buttons">
+        <button id="btnSalvarEdicao" class="btn-salvar">Salvar</button>
+        <button id="btnCancelarEdicao" class="btn-cancelar">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalVersoes" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Hist&oacute;rico de vers&otilde;es</h2>
+      <div id="listaVersoes" class="lista-versoes"></div>
+    </div>
+  </div>
+
+  <div id="modalConfirmacao" class="modal">
+    <div class="modal-content">
+      <h2>Confirmar exclus&atilde;o</h2>
+      <p>Voc&ecirc; tem certeza que deseja deletar esta anota&ccedil;&atilde;o?</p>
+      <p><strong>Aten&ccedil;&atilde;o:</strong> voc&ecirc; s&oacute; pode deletar anota&ccedil;&otilde;es at&eacute; 60 segundos ap&oacute;s a cria&ccedil;&atilde;o.</p>
+      <div class="modal-buttons">
+        <button id="btnConfirmarDelecao" class="btn-deletar">Sim, deletar</button>
+        <button id="btnCancelarDelecao" class="btn-cancelar">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/anotacoes.js"></script>
+</body>
+</html>

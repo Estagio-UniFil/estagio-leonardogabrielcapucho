@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - GACP Tecnologia</title>
+    <link rel="stylesheet" href="../css/login.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-frame">
+            <div class="login-content">
+                <div class="logo-container">
+                    <div class="logo-icon">
+                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                            <rect x="8" y="12" width="32" height="24" rx="2" fill="#004AAD"/>
+                            <rect x="12" y="16" width="24" height="16" rx="1" fill="white"/>
+                            <circle cx="20" cy="24" r="2" fill="#004AAD"/>
+                            <path d="M24 20L28 24L24 28" stroke="#004AAD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="logo-text">
+                        <h2 class="logo-title">GACP</h2>
+                        <p class="logo-subtitle">TECNOLOGIA</p>
+                    </div>
+                </div>
+
+                <form id="loginForm" class="login-form">
+                    <div class="input-group">
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username" 
+                            class="form-input" 
+                            placeholder="Nome de usuário"
+                            required
+                        >
+                    </div>
+                    
+                    <div class="input-group">
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            class="form-input" 
+                            placeholder="Senha"
+                            required
+                        >
+                    </div>
+
+                    <button type="submit" class="login-btn">
+                        Entrar
+                    </button>
+                </form>
+
+                <div id="errorMessage" class="error-message" style="display: none;"></div>
+                
+                <div class="login-info">
+                    <p>Use suas credenciais do sistema GACP</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/login.js"></script>
+</body>
+</html>

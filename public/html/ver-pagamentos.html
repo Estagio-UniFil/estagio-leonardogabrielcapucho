@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ver Pagamentos - GACP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/home.css">
+  <style>
+    .main-content {
+      flex: 1;
+      padding: 48px 40px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+    .page-header {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .page-header h1 {
+      margin: 0;
+      font-size: 28px;
+      color: #0f172a;
+    }
+    .page-header p {
+      margin: 0;
+      color: #5f6c7b;
+      font-size: 15px;
+    }
+    .pagamento-item {
+      background: #ffffff;
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      border-radius: 16px;
+      padding: 20px 24px;
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: 0 12px 35px rgba(15, 23, 42, 0.08);
+    }
+    .pagamento-valor {
+      font-size: 18px;
+      font-weight: 700;
+      color: #2563eb;
+    }
+    .pagamento-data,
+    .pagamento-status {
+      color: #475569;
+      font-size: 14px;
+    }
+    .lista-vazia {
+      padding: 24px;
+      border-radius: 12px;
+      background: #f8fafc;
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      color: #475569;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <section class="profile-section">
+      <div class="profile-photo-container">
+        <img id="profilePhoto" class="profile-photo" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRkZGRkZGIi8+CjxjaXJjbGUgY3g9IjUwIiBjeT0iMzUiIHI9IjE1IiBmaWxsPSIjQ0NDQ0NDIi8+CjxyZWN0IHg9IjMwIiB5PSI2MCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjMwIiBmaWxsPSIjQ0NDQ0NDIi8+Cjwvc3ZnPgo=" alt="Foto do usu&aacute;rio">
+        <div class="photo-edit-overlay">
+          <label for="photoInput" class="photo-edit-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+              <circle cx="12" cy="13" r="4"/>
+            </svg>
+          </label>
+          <input id="photoInput" type="file" accept="image/*" hidden>
+        </div>
+      </div>
+      <h3 id="userName" class="user-name">Carregando...</h3>
+      <button type="button" class="logout-btn" onclick="logout()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16,17 21,12 16,7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        Sair
+      </button>
+    </section>
+
+    <nav class="navigation-section">
+      <h4 class="nav-title">Navega&ccedil;&atilde;o</h4>
+      <a class="nav-link" href="/home">Home</a>
+      <a class="nav-link" href="/ver-empenhos">Ver Empenhos</a>
+      <a class="nav-link active" href="/ver-pagamentos">Ver Pagamentos</a>
+      <a class="nav-link" href="/anotacoes">Anota&ccedil;&otilde;es</a>
+      <a class="nav-link" href="/adicionar-empenho">Adicionar Empenho</a>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <header class="page-header">
+      <h1>Pagamentos confirmados</h1>
+      <p>Acompanhe os comprovantes e o status de cada empenho pago.</p>
+    </header>
+
+    <section id="listaPagamentos"></section>
+  </main>
+
+  <script>
+    function carregarPerfil() {
+      const token = localStorage.getItem('token');
+      const user = localStorage.getItem('user');
+      if (!token || !user) {
+        window.location.href = '/';
+        return false;
+      }
+      try {
+        const userData = JSON.parse(user);
+        const nomeEl = document.getElementById('userName');
+        if (nomeEl) nomeEl.textContent = userData.nome;
+        const savedPhoto = localStorage.getItem('profilePhoto');
+        const photoEl = document.getElementById('profilePhoto');
+        if (savedPhoto && photoEl) {
+          photoEl.src = savedPhoto;
+        }
+        const input = document.getElementById('photoInput');
+        if (input) {
+          input.addEventListener('change', trocarFotoPerfil);
+        }
+        return true;
+      } catch (error) {
+        console.error('Erro ao carregar perfil:', error);
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/';
+        return false;
+      }
+    }
+
+    function trocarFotoPerfil(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const photoUrl = e.target.result;
+        const img = document.getElementById('profilePhoto');
+        if (img) img.src = photoUrl;
+        localStorage.setItem('profilePhoto', photoUrl);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      localStorage.removeItem('profilePhoto');
+      window.location.href = '/';
+    }
+
+    async function carregarPagamentos() {
+      try {
+        const response = await fetch('/api/pagamentos');
+        if (!response.ok) {
+          throw new Error('Erro ao carregar pagamentos');
+        }
+        const pagamentos = await response.json();
+        const lista = document.getElementById('listaPagamentos');
+        if (!lista) return;
+        lista.innerHTML = '';
+
+        if (!pagamentos || pagamentos.length === 0) {
+          lista.innerHTML = '<div class="lista-vazia">Nenhum pagamento encontrado.</div>';
+          return;
+        }
+
+        pagamentos.forEach((pagamento) => {
+          const div = document.createElement('div');
+          div.className = 'pagamento-item';
+          const dataFormatada = pagamento.data_pagamento ? new Date(pagamento.data_pagamento).toLocaleDateString('pt-BR') : 'Data n&atilde;o informada';
+          div.innerHTML = `
+            <div class="pagamento-valor">R$ ${Number(pagamento.valor_pago || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
+            <div class="pagamento-data"><strong>Data:</strong> ${dataFormatada}</div>
+            <div class="pagamento-status"><strong>Status:</strong> ${pagamento.status_pagamento || 'N&atilde;o informado'}</div>
+          `;
+          lista.appendChild(div);
+        });
+      } catch (error) {
+        console.error('Erro:', error);
+        const lista = document.getElementById('listaPagamentos');
+        if (lista) {
+          lista.innerHTML = '<div class="lista-vazia" style="color:#dc2626;">Erro ao carregar pagamentos. Tente novamente.</div>';
+        }
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (carregarPerfil()) {
+        carregarPagamentos();
+      }
+    });
+  </script>
+</body>
+</html>

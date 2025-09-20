@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Adicionar Pagamento</title>
+</head>
+<body style="font-family: Arial; text-align: center; margin-top: 50px;">
+  <h1>Cadastro de Pagamento</h1>
+  <form id="formPagamento">
+    <input type="number" step="0.01" id="valor_pago" placeholder="Valor Pago" required><br><br>
+    <input type="date" id="data_pagamento" required><br><br>
+    <select id="empenho_id" required></select><br><br>
+    <button type="submit">Registrar Pagamento</button>
+  </form>
+
+  <script>
+    async function carregarEmpenhos() {
+      const res = await fetch('/empenhos');
+      const empenhos = await res.json();
+      const select = document.getElementById('empenho_id');
+      select.innerHTML = '<option value="">Selecione um empenho</option>';
+      empenhos.forEach(e => {
+        const option = document.createElement('option');
+        option.value = e.id;
+        option.textContent = `${e.numero} - ${e.descricao}`;
+        select.appendChild(option);
+      });
+    }
+
+    document.getElementById('formPagamento').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const body = {
+        valor_pago: parseFloat(document.getElementById('valor_pago').value),
+        data_pagamento: document.getElementById('data_pagamento').value,
+        status_pagamento: 'Confirmado',
+        empenho_id: parseInt(document.getElementById('empenho_id').value)
+      };
+      const res = await fetch('/pagamentos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      if (res.ok) {
+        alert('Pagamento cadastrado!');
+        window.location.href = 'ver-pagamentos.html';
+      } else {
+        const data = await res.json();
+        alert('Erro: ' + data.erro);
+      }
+    });
+
+    carregarEmpenhos();
+  </script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home - GACP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/home.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <section class="profile-section">
+      <div class="profile-photo-container">
+        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRkZGRkZGIi8+CjxjaXJjbGUgY3g9IjUwIiBjeT0iMzUiIHI9IjE1IiBmaWxsPSIjQ0NDQ0NDIi8+CjxyZWN0IHg9IjMwIiB5PSI2MCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjMwIiBmaWxsPSIjQ0NDQ0NDIi8+Cjwvc3ZnPgo=" alt="Foto do usu&aacute;rio" id="profilePhoto" class="profile-photo">
+        <div class="photo-edit-overlay">
+          <label for="photoInput" class="photo-edit-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+              <circle cx="12" cy="13" r="4"/>
+            </svg>
+          </label>
+          <input type="file" id="photoInput" accept="image/*" hidden>
+        </div>
+      </div>
+      <h3 class="user-name" id="userName">Carregando...</h3>
+      <button onclick="logout()" class="logout-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16,17 21,12 16,7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        Sair
+      </button>
+    </section>
+
+    <nav class="navigation-section">
+      <h4 class="nav-title">Navega&ccedil;&atilde;o</h4>
+      <a class="nav-link active" href="/home">Home</a>
+      <a class="nav-link" href="/ver-empenhos">Ver Empenhos</a>
+      <a class="nav-link" href="/ver-pagamentos">Ver Pagamentos</a>
+      <a class="nav-link" href="/anotacoes">Anota&ccedil;&otilde;es</a>
+      <a class="nav-link" href="/adicionar-empenho">Adicionar Empenho</a>
+    </nav>
+
+    <section class="secondary-section">
+      <h4 class="nav-title">Histórico de empenhos</h4>
+      <div id="empenhosRecentes" class="history-list"></div>
+    </section>
+  </aside>
+
+  <main class="main-content home-main">
+    <header class="page-header">
+      <h1>Bem-vindo <span id="welcomeUserName">usu&aacute;rio</span> ao GACP</h1>
+      <p class="page-subtitle">Escolha uma das a&ccedil;&otilde;es abaixo para gerenciar os empenhos e anota&ccedil;&otilde;es.</p>
+    </header>
+
+    <section class="home-actions">
+      <button class="button" onclick="window.location.href='/adicionar-empenho'">Adicionar empenho</button>
+      <button class="button" onclick="window.location.href='/ver-empenhos'">Ver empenhos</button>
+      <button class="button" onclick="window.location.href='/anotacoes'">Anota&ccedil;&otilde;es</button>
+    </section>
+
+    <section class="lembrete">
+      <div class="lembrete-header">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12,6 12,12 16,14"/>
+        </svg>
+        Lembretes de Pagamentos
+      </div>
+      <div class="lembrete-content" id="lembreteContent">
+        <div class="lembrete-item">
+          <strong>Empenho 1012</strong> – Secretaria de Sa&uacute;de<br>
+          <small>Vence dia 12/04 - R$ 15.000,00</small>
+        </div>
+        <div class="lembrete-item">
+          <strong>Empenho 1088</strong> – Secretaria de Educa&ccedil;&atilde;o<br>
+          <small>Vence dia 15/04 - R$ 4.500,00</small>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="../js/home.js"></script>
+</body>
+</html>
+

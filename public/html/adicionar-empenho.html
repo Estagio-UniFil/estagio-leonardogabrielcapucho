@@ -1,0 +1,127 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Adicionar Empenho - GACP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/adicionar-empenho.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <section class="profile-section">
+      <div class="profile-photo-container">
+        <img id="profilePhoto" class="profile-photo" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRkZGRkZGIi8+CjxjaXJjbGUgY3g9IjUwIiBjeT0iMzUiIHI9IjE1IiBmaWxsPSIjQ0NDQ0NDIi8+CjxyZWN0IHg9IjMwIiB5PSI2MCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjMwIiBmaWxsPSIjQ0NDQ0NDIi8+Cjwvc3ZnPgo=" alt="Foto do usuário">
+        <div class="photo-edit-overlay">
+          <label for="photoInput" class="photo-edit-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+              <circle cx="12" cy="13" r="4"/>
+            </svg>
+          </label>
+          <input id="photoInput" type="file" accept="image/*" hidden>
+        </div>
+      </div>
+      <h3 id="userName" class="user-name">Carregando...</h3>
+      <button type="button" class="logout-btn" onclick="logout()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16,17 21,12 16,7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        Sair
+      </button>
+    </section>
+
+    <nav class="navigation-section">
+      <h4 class="nav-title">Navegação</h4>
+      <a class="nav-link" href="/home">Home</a>
+      <a class="nav-link" href="/ver-empenhos">Ver Empenhos</a>
+      <a class="nav-link" href="/ver-pagamentos">Ver Pagamentos</a>
+      <a class="nav-link" href="/anotacoes">Anotações</a>
+      <a class="nav-link active" href="/adicionar-empenho">Adicionar Empenho</a>
+    </nav>
+  </aside>
+
+  <main class="main">
+    <section class="card">
+      <header class="card-header">
+        <div>
+          <p class="card-kicker">Cadastro</p>
+          <h1>Registrar novo empenho</h1>
+          <p class="card-subtitle">Preencha os dados básicos e informe a nota fiscal relacionada.</p>
+        </div>
+      </header>
+
+      <form id="formEmpenho" class="form-grid">
+        <section class="form-section">
+          <h2>Dados do Empenho</h2>
+          <div class="field-group">
+            <label for="numero">Número do Empenho</label>
+            <input type="text" id="numero" required placeholder="Ex: 2024-0001" maxlength="50">
+          </div>
+          <div class="field-group">
+            <label for="descricao">Descrição</label>
+            <textarea id="descricao" rows="3" required placeholder="Descreva o objeto do empenho"></textarea>
+          </div>
+          <div class="field-grid">
+            <div class="field-group">
+              <label for="valor">Valor</label>
+              <input type="number" id="valor" required min="0" step="0.01" placeholder="0,00">
+            </div>
+            <div class="field-group">
+              <label for="data_vencimento">Data de Vencimento</label>
+              <input type="date" id="data_vencimento" required>
+            </div>
+          </div>
+          <div class="field-group">
+            <label for="secretario">Secretário Responsável</label>
+            <select id="secretario" required>
+              <option value="">Selecione...</option>
+              <option value="Mario Pizoni|Administração">Mario Pizoni • Administração</option>
+              <option value="Laila Giota|Saúde">Laila Giota • Saúde</option>
+              <option value="Bruna Amaral|Educação">Bruna Amaral • Educação</option>
+              <option value="Alexandre Frassato|Esportes">Alexandre Frassato • Esportes</option>
+              <option value="Ana Costa|Cultura">Ana Costa • Cultura</option>
+              <option value="Ailton Picolo|Urbanismo">Ailton Picolo • Urbanismo</option>
+              <option value="Eraldo Lotti|Serviços Públicos">Eraldo Lotti • Serviços Públicos</option>
+              <option value="Maria|Serviço Social">Maria • Serviço Social</option>
+              <option value="José Custódio|Fazenda">José Custódio • Fazenda</option>
+              <option value="Gama|Gabinete">Gama (prefeito) • Gabinete</option>
+            </select>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <h2>Dados da Nota Fiscal</h2>
+          <div class="field-group">
+            <label for="nota_numero">Número da Nota Fiscal</label>
+            <input type="text" id="nota_numero" placeholder="Ex: 12345" maxlength="60">
+          </div>
+          <div class="field-grid">
+            <div class="field-group">
+              <label for="nota_valor">Valor da Nota</label>
+              <input type="number" id="nota_valor" min="0" step="0.01" placeholder="0,00">
+            </div>
+            <div class="field-group">
+              <label for="nota_data">Data de Emissão</label>
+              <input type="date" id="nota_data">
+            </div>
+          </div>
+          <p class="nota-hint">Informe somente se a nota fiscal já estiver disponível.</p>
+        </section>
+
+        <footer class="form-footer">
+          <span id="formMessage" class="form-message" role="status"></span>
+          <button type="submit" id="btnSubmit" class="btn-primary">Salvar empenho</button>
+        </footer>
+      </form>
+    </section>
+  </main>
+
+  <script src="../js/adicionar-empenho.js"></script>
+</body>
+</html>
+
