@@ -1,5 +1,6 @@
 ﻿const API_BASE_URL = 'http://localhost:3000/api';
 const urlParams = new URLSearchParams(window.location.search);
+const RECENT_STORAGE_KEY = 'recentEmpenhos';
 const empenhoId = urlParams.get('id');
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -118,6 +119,8 @@ function preencherDados(empenho) {
   setText('notaNumero', empenho.nota_fiscal_numero || '-');
   setText('notaValor', empenho.nota_fiscal_valor ? formatCurrency(empenho.nota_fiscal_valor) : '-');
   setText('notaData', empenho.nota_fiscal_data ? formatDate(empenho.nota_fiscal_data) : '-');
+
+  registrarEmpenhoRecente(empenho);
 }
 
 function setText(id, value) {
@@ -232,6 +235,30 @@ async function confirmarPagamento() {
     if (!pagamentoConfirmado && btn) {
       btn.disabled = false;
     }
+  }
+}
+
+function registrarEmpenhoRecente(empenho) {
+  if (!empenho || typeof empenho.id === 'undefined') {
+    return;
+  }
+
+  const registro = {
+    id: empenho.id,
+    numero: empenho.numero || '',
+    descricao: empenho.descricao || '',
+    acessadoEm: new Date().toISOString()
+  };
+
+  try {
+    const armazenados = JSON.parse(localStorage.getItem(RECENT_STORAGE_KEY) || '[]');
+    const lista = Array.isArray(armazenados) ? armazenados : [];
+    const filtrados = lista.filter((item) => item && item.id !== registro.id);
+    filtrados.unshift(registro);
+    localStorage.setItem(RECENT_STORAGE_KEY, JSON.stringify(filtrados.slice(0, 5)));
+  } catch (error) {
+    console.warn('Nao foi possivel atualizar o historico local:', error);
+    localStorage.setItem(RECENT_STORAGE_KEY, JSON.stringify([registro]));
   }
 }
 

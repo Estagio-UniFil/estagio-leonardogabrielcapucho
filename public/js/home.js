@@ -1,89 +1,243 @@
 const API_BASE_URL = 'http://localhost:3000/api';
+const RECENT_STORAGE_KEY = 'recentEmpenhos';
+let cachedEmpenhos = null;
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   const token = localStorage.getItem('token');
   const user = localStorage.getItem('user');
-  
+
   if (!token || !user) {
     window.location.href = '/';
     return;
   }
-  
+
   try {
     const userData = JSON.parse(user);
-    document.getElementById('userName').textContent = userData.nome;
-    document.getElementById('welcomeUserName').textContent = userData.nome;
-    
+    const userName = document.getElementById('userName');
+    const welcomeName = document.getElementById('welcomeUserName');
+    if (userName) userName.textContent = userData.nome;
+    if (welcomeName) welcomeName.textContent = userData.nome;
+
     const savedPhoto = localStorage.getItem('profilePhoto');
     if (savedPhoto) {
-      document.getElementById('profilePhoto').src = savedPhoto;
+      const photoEl = document.getElementById('profilePhoto');
+      if (photoEl) {
+        photoEl.src = savedPhoto;
+      }
     }
-    
-    carregarEmpenhosRecentes();
-      } catch (error) {
-      console.error('Erro ao carregar dados do usuário:', error);
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/';
-    }
-});
 
-document.getElementById('photoInput').addEventListener('change', function(e) {
-  const file = e.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const photoUrl = e.target.result;
-      document.getElementById('profilePhoto').src = photoUrl;
-      localStorage.setItem('profilePhoto', photoUrl);
-    };
-    reader.readAsDataURL(file);
+    const photoInput = document.getElementById('photoInput');
+    if (photoInput) {
+      photoInput.addEventListener('change', atualizarFotoPerfil);
+    }
+
+    carregarEmpenhosRecentes();
+    carregarLembretesPagamentos();
+  } catch (error) {
+    console.error('Erro ao carregar dados do usuario:', error);
+    logout();
   }
 });
+
+function atualizarFotoPerfil(event) {
+  const file = event.target.files && event.target.files[0];
+  if (!file) {
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const photoUrl = e.target && e.target.result;
+    const photoEl = document.getElementById('profilePhoto');
+    if (photoUrl && photoEl) {
+      photoEl.src = photoUrl;
+      localStorage.setItem('profilePhoto', photoUrl);
+    }
+  };
+  reader.readAsDataURL(file);
+}
 
 async function carregarEmpenhosRecentes() {
+  const container = document.getElementById('empenhosRecentes');
+  if (!container) {
+    return;
+  }
+
+  container.innerHTML = '<div class="loading">Carregando historico...</div>';
+
   try {
-    const empenhosMock = [
-      { id: 1, numero: '1012', descricao: 'Secretaria de Saúde - Material hospitalar' },
-      { id: 2, numero: '1015', descricao: 'Secretaria de Educação - Material escolar' },
-      { id: 3, numero: '1018', descricao: 'Secretaria de Urbanismo - Obras públicas' }
-    ];
-    
-    exibirEmpenhosRecentes(empenhosMock);
-    
-    // Descomentar quando API estiver funcionando:
-    /*
-    const response = await fetch(`${API_BASE_URL}/empenhos?limit=5`);
-    if (response.ok) {
-      const empenhos = await response.json();
-      exibirEmpenhosRecentes(empenhos);
+    const [empenhos, historicoLocal] = await Promise.all([
+      buscarEmpenhos(),
+      Promise.resolve(obterHistoricoLocal())
+    ]);
+
+    const mapaEmpenhos = new Map(empenhos.map((item) => [String(item.id), item]));
+    const recentes = historicoLocal
+      .map((registro) => mapaEmpenhos.get(String(registro.id)))
+      .filter(Boolean);
+
+    const lista = (recentes.length > 0 ? recentes : empenhos).slice(0, 5);
+
+    if (lista.length === 0) {
+      container.innerHTML = '<div class="empty-state">Nenhum empenho cadastrado.</div>';
+      return;
     }
-    */
+
+    exibirEmpenhosRecentes(lista, container);
   } catch (error) {
-    console.error('Erro ao carregar empenhos:', error);
+    console.error('Erro ao carregar empenhos recentes:', error);
+    container.innerHTML = '<div class="error-message">Nao foi possivel carregar o historico.</div>';
   }
 }
 
-function exibirEmpenhosRecentes(empenhos) {
-  const container = document.getElementById('empenhosRecentes');
-  container.innerHTML = '';
-  
-        empenhos.forEach(empenho => {
-        const link = document.createElement('a');
-        link.href = `/detalhes-empenho?id=${empenho.id}`;
-        link.className = 'empenho-link';
-        link.innerHTML = `
-          <strong>Empenho ${empenho.numero}</strong><br>
-          <small>${empenho.descricao.substring(0, 30)}...</small>
-        `;
-        container.appendChild(link);
-      });
-}
+async function carregarLembretesPagamentos() {
+  const container = document.getElementById('lembreteContent');
+  if (!container) {
+    return;
+  }
 
-    function logout() {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      localStorage.removeItem('profilePhoto');
-      window.location.href = '/';
+  container.innerHTML = '<div class="loading">Carregando lembretes...</div>';
+
+  try {
+    const empenhos = await buscarEmpenhos();
+    const pendentes = empenhos
+      .filter((empenho) => (empenho.status_geral || '').toLowerCase() !== 'pago')
+      .sort((a, b) => ordenarPorVencimento(a.data_vencimento, b.data_vencimento))
+      .slice(0, 5);
+
+    if (!pendentes.length) {
+      container.innerHTML = '<div class="empty-state">Nenhum pagamento pendente.</div>';
+      return;
     }
 
+    container.innerHTML = '';
+    pendentes.forEach((empenho) => container.appendChild(criarLembreteItem(empenho)));
+  } catch (error) {
+    console.error('Erro ao carregar lembretes de pagamento:', error);
+    container.innerHTML = '<div class="error-message">Nao foi possivel carregar os lembretes.</div>';
+  }
+}
+
+async function buscarEmpenhos(forceRefresh = false) {
+  if (!forceRefresh && Array.isArray(cachedEmpenhos)) {
+    return cachedEmpenhos;
+  }
+
+  const token = localStorage.getItem('token');
+  const headers = token ? { Authorization: 'Bearer ' + token } : {};
+  const response = await fetch(`${API_BASE_URL}/empenhos`, { headers });
+
+  if (!response.ok) {
+    throw new Error('Nao foi possivel carregar os empenhos.');
+  }
+
+  const payload = await response.json();
+  cachedEmpenhos = Array.isArray(payload) ? payload : [];
+  return cachedEmpenhos;
+}
+
+function obterHistoricoLocal() {
+  try {
+    const armazenados = JSON.parse(localStorage.getItem(RECENT_STORAGE_KEY) || '[]');
+    if (!Array.isArray(armazenados)) {
+      return [];
+    }
+
+    return armazenados
+      .filter((registro) => registro && typeof registro.id !== 'undefined')
+      .sort((a, b) => {
+        const dataA = new Date(a.acessadoEm || 0).getTime();
+        const dataB = new Date(b.acessadoEm || 0).getTime();
+        return dataB - dataA;
+      });
+  } catch (error) {
+    console.warn('Nao foi possivel ler o historico local:', error);
+    return [];
+  }
+}
+
+function exibirEmpenhosRecentes(empenhos, container) {
+  container.innerHTML = '';
+
+  empenhos.slice(0, 5).forEach((empenho) => {
+    const link = document.createElement('a');
+    link.href = `/detalhes-empenho?id=${encodeURIComponent(empenho.id)}`;
+    link.className = 'empenho-link';
+    link.innerHTML = `
+      <strong>Empenho ${escapeHtml(empenho.numero || '')}</strong><br>
+      <small>${escapeHtml(truncarDescricao(empenho.descricao || 'Sem descricao'))}</small>
+    `;
+    container.appendChild(link);
+  });
+}
+
+function criarLembreteItem(empenho) {
+  const item = document.createElement('div');
+  item.className = 'lembrete-item';
+  const secretaria = empenho.secretario_setor || empenho.secretario_nome || 'Secretaria nao informada';
+
+  item.innerHTML = `
+    <strong>Empenho ${escapeHtml(empenho.numero || '')}</strong> - ${escapeHtml(secretaria)}<br>
+    <small>Vence em ${formatDate(empenho.data_vencimento)} - ${formatCurrency(empenho.valor)}</small>
+  `;
+
+  item.addEventListener('click', () => {
+    window.location.href = `/detalhes-empenho?id=${encodeURIComponent(empenho.id)}`;
+  });
+
+  return item;
+}
+
+function ordenarPorVencimento(dataA, dataB) {
+  return obterValorData(dataA) - obterValorData(dataB);
+}
+
+function obterValorData(valor) {
+  if (!valor) {
+    return Number.MAX_SAFE_INTEGER;
+  }
+  const data = new Date(valor);
+  return Number.isNaN(data.getTime()) ? Number.MAX_SAFE_INTEGER : data.getTime();
+}
+
+function formatCurrency(value) {
+  const numero = Number(value);
+  if (Number.isNaN(numero)) {
+    return '-';
+  }
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(numero);
+}
+
+function formatDate(dateString) {
+  if (!dateString) {
+    return '-';
+  }
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) {
+    return '-';
+  }
+  return date.toLocaleDateString('pt-BR');
+}
+
+function truncarDescricao(texto, limite = 50) {
+  if (!texto) {
+    return '';
+  }
+  return texto.length > limite ? texto.slice(0, limite).trimEnd() + '...' : texto;
+}
+
+function escapeHtml(valor) {
+  return String(valor)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function logout() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  localStorage.removeItem('profilePhoto');
+  window.location.href = '/';
+}

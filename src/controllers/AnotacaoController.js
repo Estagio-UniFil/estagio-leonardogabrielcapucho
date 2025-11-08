@@ -13,7 +13,7 @@ const AnotacaoController = {
       if (!textoLimpo) {
         return res.status(400).json({
           success: false,
-          message: 'O texto da anotacao e obrigatorio'
+          message: 'O texto da anotação é obrigatório'
         });
       }
 
@@ -23,7 +23,7 @@ const AnotacaoController = {
         if (!Number.isInteger(empenhoIdParse) || empenhoIdParse <= 0) {
           return res.status(400).json({
             success: false,
-            message: 'Selecao de empenho invalida'
+            message: 'Seleção de empenho inválida'
           });
         }
 
@@ -31,7 +31,7 @@ const AnotacaoController = {
         if (!empenho) {
           return res.status(400).json({
             success: false,
-            message: 'Empenho vinculado nao encontrado'
+            message: 'Empenho vinculado não encontrado'
           });
         }
         vinculoEmpenho = empenho.id;
@@ -58,18 +58,18 @@ const AnotacaoController = {
       res.status(201).json({
         success: true,
         data: anotacao,
-        message: 'Anotacao criada com sucesso'
+        message: 'Anotação criada com sucesso'
       });
     } catch (error) {
       if (error instanceof ForeignKeyConstraintError) {
-        console.warn('Falha ao vincular empenho na criacao da anotacao:', error);
+        console.warn('Falha ao vincular empenho na criação da anotação:', error);
         return res.status(400).json({
           success: false,
-          message: 'Empenho vinculado nao encontrado. Atualize a lista e tente novamente.'
+          message: 'Empenho vinculado não encontrado. Atualize a lista e tente novamente.'
         });
       }
 
-      console.error('Erro ao criar anotacao:', error);
+      console.error('Erro ao criar anotação:', error);
       res.status(500).json({
         success: false,
         message: 'Erro interno do servidor'
@@ -101,7 +101,7 @@ const AnotacaoController = {
         data: anotacoes || []
       });
     } catch (error) {
-      console.error('Erro ao listar anotaÃƒÂ§ÃƒÂµes:', error);
+      console.error('Erro ao listar anotações:', error);
       res.status(500).json({
         success: false,
         message: 'Erro interno do servidor'
@@ -126,16 +126,16 @@ const AnotacaoController = {
       });
 
       if (!anotacao) {
-        return res.status(404).json({ 
-          success: false, 
-          message: 'AnotaÃƒÂ§ÃƒÂ£o nÃƒÂ£o encontrada' 
+        return res.status(404).json({
+          success: false,
+          message: 'Anotação não encontrada'
         });
       }
 
       if (anotacao.is_deleted) {
-        return res.status(400).json({ 
-          success: false, 
-          message: 'NÃƒÂ£o ÃƒÂ© possÃƒÂ­vel editar uma anotaÃƒÂ§ÃƒÂ£o deletada' 
+        return res.status(400).json({
+          success: false,
+          message: 'Não é possível editar uma anotação deletada'
         });
       }
 
@@ -144,7 +144,7 @@ const AnotacaoController = {
         data: anotacao
       });
     } catch (error) {
-      console.error('Erro ao buscar anotaÃƒÂ§ÃƒÂ£o:', error);
+      console.error('Erro ao buscar anotação:', error);
       res.status(500).json({
         success: false,
         message: 'Erro interno do servidor'
@@ -156,41 +156,41 @@ const AnotacaoController = {
     try {
       const { id } = req.params;
       const { texto, motivo, empenho_id } = req.body;
-      
+
       if (!texto || texto.trim() === '') {
-        return res.status(400).json({ 
-          success: false, 
-          message: 'O texto da anotacao e obrigatorio' 
+        return res.status(400).json({
+          success: false,
+          message: 'O texto da anotação é obrigatório'
         });
       }
 
       if (!motivo || motivo.trim() === '') {
-        return res.status(400).json({ 
-          success: false, 
-          message: 'O motivo da edicao e obrigatorio' 
+        return res.status(400).json({
+          success: false,
+          message: 'O motivo da edição é obrigatório'
         });
       }
 
       const anotacao = await Anotacao.findByPk(id);
-      
+
       if (!anotacao) {
-        return res.status(404).json({ 
-          success: false, 
-          message: 'Anotacao nao encontrada' 
+        return res.status(404).json({
+          success: false,
+          message: 'Anotação não encontrada'
         });
       }
 
       if (anotacao.created_by !== req.user.id) {
-        return res.status(403).json({ 
-          success: false, 
-          message: 'Voce nao tem permissao para editar esta anotacao' 
+        return res.status(403).json({
+          success: false,
+          message: 'Você não tem permissão para editar esta anotação'
         });
       }
 
       if (anotacao.is_deleted) {
-        return res.status(400).json({ 
-          success: false, 
-          message: 'Nao e possivel editar uma anotacao deletada' 
+        return res.status(400).json({
+          success: false,
+          message: 'Não é possível editar uma anotação deletada'
         });
       }
 
@@ -203,7 +203,7 @@ const AnotacaoController = {
           if (!Number.isInteger(empenhoIdParse) || empenhoIdParse <= 0) {
             return res.status(400).json({
               success: false,
-              message: 'Selecao de empenho invalida'
+              message: 'Seleção de empenho inválida'
             });
           }
 
@@ -211,7 +211,7 @@ const AnotacaoController = {
           if (!empenho) {
             return res.status(400).json({
               success: false,
-              message: 'Empenho vinculado nao encontrado'
+              message: 'Empenho vinculado não encontrado'
             });
           }
           vinculoEmpenho = empenho.id;
@@ -246,10 +246,10 @@ const AnotacaoController = {
       res.json({
         success: true,
         data: anotacao,
-        message: 'AnotaÃƒÂ§ÃƒÂ£o atualizada com sucesso'
+        message: 'Anotação atualizada com sucesso'
       });
     } catch (error) {
-      console.error('Erro ao atualizar anotaÃƒÂ§ÃƒÂ£o:', error);
+      console.error('Erro ao atualizar anotação:', error);
       res.status(500).json({
         success: false,
         message: 'Erro interno do servidor'
@@ -261,25 +261,25 @@ const AnotacaoController = {
     try {
       const { id } = req.params;
       const anotacao = await Anotacao.findByPk(id);
-      
+
       if (!anotacao) {
-        return res.status(404).json({ 
-          success: false, 
-          message: 'AnotaÃƒÂ§ÃƒÂ£o nÃƒÂ£o encontrada' 
+        return res.status(404).json({
+          success: false,
+          message: 'Anotação não encontrada'
         });
       }
 
       if (anotacao.is_deleted) {
-        return res.status(400).json({ 
-          success: false, 
-          message: 'AnotaÃƒÂ§ÃƒÂ£o jÃƒÂ¡ foi deletada' 
+        return res.status(400).json({
+          success: false,
+          message: 'Anotação já foi deletada'
         });
       }
 
       if (anotacao.created_by !== req.user.id) {
-        return res.status(403).json({ 
-          success: false, 
-          message: 'VocÃƒÂª nÃƒÂ£o tem permissÃƒÂ£o para deletar esta anotaÃƒÂ§ÃƒÂ£o' 
+        return res.status(403).json({
+          success: false,
+          message: 'Você não tem permissão para deletar esta anotação'
         });
       }
 
@@ -288,9 +288,9 @@ const AnotacaoController = {
       const diferencaSegundos = (agora - tempoCriacao) / 1000;
 
       if (diferencaSegundos > 60) {
-        return res.status(403).json({ 
-          success: false, 
-          message: 'NÃƒÂ£o ÃƒÂ© possÃƒÂ­vel deletar anotaÃƒÂ§ÃƒÂµes apÃƒÂ³s 60 segundos da criaÃƒÂ§ÃƒÂ£o' 
+        return res.status(403).json({
+          success: false,
+          message: 'Não é possível deletar anotações após 60 segundos da criação'
         });
       }
 
@@ -299,15 +299,15 @@ const AnotacaoController = {
         deleted_at: agora
       });
 
-      res.json({ 
-        success: true, 
-        message: 'AnotaÃƒÂ§ÃƒÂ£o deletada com sucesso. VocÃƒÂª tem 60 segundos para desfazer.' 
+      res.json({
+        success: true,
+        message: 'Anotação deletada com sucesso. Você tem 60 segundos para desfazer.'
       });
     } catch (error) {
-      console.error('Erro ao deletar anotaÃƒÂ§ÃƒÂ£o:', error);
-      res.status(500).json({ 
-        success: false, 
-        message: 'Erro interno do servidor' 
+      console.error('Erro ao deletar anotação:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Erro interno do servidor'
       });
     }
   },
@@ -316,25 +316,25 @@ const AnotacaoController = {
     try {
       const { id } = req.params;
       const anotacao = await Anotacao.findByPk(id);
-      
+
       if (!anotacao) {
-        return res.status(404).json({ 
-          success: false, 
-          message: 'AnotaÃƒÂ§ÃƒÂ£o nÃƒÂ£o encontrada' 
+        return res.status(404).json({
+          success: false,
+          message: 'Anotação não encontrada'
         });
       }
 
       if (anotacao.created_by !== req.user.id) {
-        return res.status(403).json({ 
-          success: false, 
-          message: 'VocÃƒÂª nÃƒÂ£o tem permissÃƒÂ£o para desfazer esta deleÃƒÂ§ÃƒÂ£o' 
+        return res.status(403).json({
+          success: false,
+          message: 'Você não tem permissão para desfazer esta deleção'
         });
       }
 
       if (!anotacao.is_deleted) {
-        return res.status(400).json({ 
-          success: false, 
-          message: 'AnotaÃƒÂ§ÃƒÂ£o nÃƒÂ£o foi deletada' 
+        return res.status(400).json({
+          success: false,
+          message: 'Anotação não foi deletada'
         });
       }
 
@@ -343,9 +343,9 @@ const AnotacaoController = {
       const diferencaSegundos = (agora - tempoDelecao) / 1000;
 
       if (diferencaSegundos > 60) {
-        return res.status(403).json({ 
-          success: false, 
-          message: 'NÃƒÂ£o ÃƒÂ© possÃƒÂ­vel desfazer a deleÃƒÂ§ÃƒÂ£o apÃƒÂ³s 60 segundos' 
+        return res.status(403).json({
+          success: false,
+          message: 'Não é possível desfazer a deleção após 60 segundos'
         });
       }
 
@@ -354,15 +354,15 @@ const AnotacaoController = {
         deleted_at: null
       });
 
-      res.json({ 
-        success: true, 
-        message: 'DeleÃƒÂ§ÃƒÂ£o desfeita com sucesso' 
+      res.json({
+        success: true,
+        message: 'Deleção desfeita com sucesso'
       });
     } catch (error) {
-      console.error('Erro ao desfazer deleÃƒÂ§ÃƒÂ£o:', error);
-      res.status(500).json({ 
-        success: false, 
-        message: 'Erro interno do servidor' 
+      console.error('Erro ao desfazer deleção:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Erro interno do servidor'
       });
     }
   },
@@ -371,48 +371,48 @@ const AnotacaoController = {
     try {
       const { id } = req.params;
       const anotacao = await Anotacao.findByPk(id);
-      
+
       if (!anotacao) {
-        return res.status(404).json({ 
-          success: false, 
-          message: 'AnotaÃƒÂ§ÃƒÂ£o nÃƒÂ£o encontrada' 
+        return res.status(404).json({
+          success: false,
+          message: 'Anotação não encontrada'
         });
       }
 
       if (req.user.login !== 'admin') {
-        return res.status(403).json({ 
-          success: false, 
-          message: 'Apenas administradores podem deletar permanentemente anotaÃƒÂ§ÃƒÂµes' 
+        return res.status(403).json({
+          success: false,
+          message: 'Apenas administradores podem deletar permanentemente anotações'
         });
       }
 
       await anotacao.destroy();
 
-      res.json({ 
-        success: true, 
-        message: 'AnotaÃƒÂ§ÃƒÂ£o deletada permanentemente' 
+      res.json({
+        success: true,
+        message: 'Anotação deletada permanentemente'
       });
     } catch (error) {
       console.error('Erro ao deletar permanentemente:', error);
-      res.status(500).json({ 
-        success: false, 
-        message: 'Erro interno do servidor' 
+      res.status(500).json({
+        success: false,
+        message: 'Erro interno do servidor'
       });
     }
   },
 
   async listarVersoes(req, res) {
     try {
-      console.log('Ã°Å¸â€Â Iniciando busca de versÃƒÂµes para anotaÃƒÂ§ÃƒÂ£o:', req.params.id);
-      
+      console.log('Iniciando busca de versões para anotação:', req.params.id);
+
       const { id } = req.params;
       const anotacao = await Anotacao.findByPk(id);
-      
+
       if (!anotacao) {
-        console.log('Ã¢ÂÅ’ AnotaÃƒÂ§ÃƒÂ£o nÃƒÂ£o encontrada:', id);
-        return res.status(404).json({ 
-          success: false, 
-          message: 'AnotaÃƒÂ§ÃƒÂ£o nÃƒÂ£o encontrada' 
+        console.log('Anotação não encontrada:', id);
+        return res.status(404).json({
+          success: false,
+          message: 'Anotação não encontrada'
         });
       }
 
@@ -430,15 +430,15 @@ const AnotacaoController = {
         order: [['createdAt', 'DESC']]
       });
 
-      console.log('Ã¢Å“â€¦ VersÃƒÂµes encontradas:', versoes.length);
+      console.log('Versões encontradas:', versoes.length);
 
       res.json({
         success: true,
         data: versoes,
-        message: `${versoes.length} versÃƒÂ£o(ÃƒÂµes) encontrada(s)`
+        message: `${versoes.length} versão(ões) encontrada(s)`
       });
     } catch (error) {
-      console.error('Ã¢ÂÅ’ Erro ao listar versÃƒÂµes:', error);
+      console.error('Erro ao listar versões:', error);
       res.status(500).json({
         success: false,
         message: 'Erro interno do servidor'
@@ -448,24 +448,3 @@ const AnotacaoController = {
 };
 
 module.exports = AnotacaoController;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
